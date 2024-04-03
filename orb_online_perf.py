@@ -9,14 +9,6 @@ import numpy as np
 
 class ORB():
 
-    #parameters
-    threshold = 0.4
-    l1 = 12
-    l0 = 10
-    m = 1.5
-    wt = 60
-    n = 3
-
     class_size = [0.5,0.5]
 
     theta = 0.999
@@ -42,15 +34,6 @@ class ORB():
     df_pool_tr = pd.DataFrame(columns=['author_date_unix_timestamp','fix', 'ns', 'nd', 'nf', 'entrophy', 'la', 'ld', 'lt', 'ndev', 'age', 'nuc', 'exp', 'rexp', 'sexp', 'target', 'train_date'])
 
     def update_online_perf(self,index,y_hat,y, pred_date):
-        # global df_online_perf
-        #
-        # if index not in list(self.df_online_perf["index"]):
-        #     dic_aux = {"index":[int(index)],"y_hat":[y_hat],"y":[y]}
-        #     df_aux = pd.DataFrame(dic_aux)
-        #     self.df_online_perf = pd.concat([df_aux,self.df_online_perf])
-        # else:
-        #     self.df_online_perf.loc[self.df_online_perf['index'] == int(index), 'y'] = y
-
         #update the prequential errors
         last_rec_0 = 0
         last_rec_1 = 0
@@ -82,8 +65,6 @@ class ORB():
         df_aux = pd.DataFrame(dic_aux)
         self.df_preq_perf = pd.concat([self.df_preq_perf, df_aux])
         self.df_preq_perf.reset_index(inplace=True, drop=True)
-
-
 
 
     def get_perceived_performance(self):
@@ -296,4 +277,4 @@ class ORB():
         self.threshold = threshold
         self.wt = wt
 
-        self.model = ensemble.BaggingClassifier(model=(HoeffdingTreeClassifier(grace_period=100)),n_models=20,seed=12)
+        self.model = ensemble.BaggingClassifier(model=(HoeffdingTreeClassifier(grace_period=30)),n_models=20,seed=12)

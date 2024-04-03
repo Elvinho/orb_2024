@@ -4,7 +4,10 @@ from datetime import datetime
 import math
 from orb_online_perf import ORB
 from statistics import mean
+from tqdm import tqdm
 
+import warnings
+warnings.filterwarnings('ignore')
 
 sec_predict = 0
 sec_train = 0
@@ -28,16 +31,13 @@ trained_instances = 0
 initial_time = datetime.now()
 
 orb = ORB(wt=90,l0=10,l1=12,threshold=0.3,n=100,m=3)
-vetx = []
-vety = []
-for i, inst in df_tr.iterrows():
+
+for i, inst in tqdm(df_tr.iterrows(), total=df_tr.shape[0]):
 
     predicted_instances += 1
     d = inst.to_dict()
 
-
     predict_date = datetime.utcfromtimestamp(int(d["author_date_unix_timestamp"]))
-
 
     d["target"] = d["contains_bug"]
     d["commit_date"] = predict_date
@@ -52,11 +52,11 @@ for i, inst in df_tr.iterrows():
     del com["commit_date"]
 
     # Test the current model on the new "unobserved" sample
-    first_time = datetime.now()
+    # first_time = datetime.now()
     c = orb.model.predict_one(com)
-    later_time = datetime.now()
-    difference = later_time - first_time
-    sec_predict += difference.seconds + (difference.microseconds / 1000000)
+    # later_time = datetime.now()
+    # difference = later_time - first_time
+    # sec_predict += difference.seconds + (difference.microseconds / 1000000)
 
     if(c is None):
         y_pred.append(0)
@@ -90,19 +90,12 @@ for i, inst in df_tr.iterrows():
 
     orb.store_training_inst(d, i)
 
-    if(i % 20 == 0):
-        #given a date, check the instances whose the labels are available and then train the model on them
-        first_time = datetime.now()
-        orb.train_on_available_inst(orb.get_available_tr_inst(predict_date))
-        later_time = datetime.now()
-        difference = later_time - first_time
-        sec_train += difference.seconds + (difference.microseconds/1000000)
-
-
-    #this method provides the current ORB performance based on the instances already labelled
-    if(i%500==0):
-        print(i)
-
+    #given a date, check the instances whose the labels are available and then train the model on them
+    # first_time = datetime.now()
+    orb.train_on_available_inst(orb.get_available_tr_inst(predict_date))
+    # later_time = datetime.now()
+    # difference = later_time - first_time
+    # sec_train += difference.seconds + (difference.microseconds/1000000)
 
     if (previous_date != predict_date):
         previous_date = predict_date
@@ -117,8 +110,8 @@ print("media rec 0: ",mean(orb.df_preq_perf["rec_0"]))
 print("media rec 1: ",mean(orb.df_preq_perf["rec_1"]))
 print("media gmean: ",mean(orb.df_preq_perf["gmean"]))
 
-print("test time: ",sec_predict)
-print("training time: ",sec_train)
+# print("test time: ",sec_predict)
+# print("training time: ",sec_train)
 
 final_time = datetime.now()
 difference = final_time - initial_time
