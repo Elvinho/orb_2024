@@ -30,7 +30,7 @@ trained_instances = 0
 
 initial_time = datetime.now()
 
-orb = ORB(wt=90,l0=10,l1=12,threshold=0.3,n=100,m=3)
+orb = ORB(wt=25,l0=5,l1=14,threshold=0.5,n=30,m=3)
 
 for i, inst in tqdm(df_tr.iterrows(), total=df_tr.shape[0]):
 
